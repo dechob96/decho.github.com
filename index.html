@@ -140,7 +140,7 @@
       <div class="scratch-shell" id="scratchShell">
         <div class="surprise">
           <div class="surprise-inner">
-            <h2>You’re going to be an aunt 👶</h2>
+            <h2 id="surpriseText">Keep Scratching</h2>
           </div>
         </div>
         <canvas id="scratchCanvas"></canvas>
@@ -158,6 +158,7 @@
     let drawing = false;
     let lastPoint = null;
     let revealed = false;
+    const surpriseText = document.getElementById('surpriseText');
     let confettiPieces = [];
     let confettiRunning = false;
 
@@ -273,7 +274,7 @@
       const total = imageData.length / 4;
       const percent = Math.round((transparent / total) * 100);
 
-      if (percent >= 60 && !revealed) {
+      if (percent >= 70 && !revealed) {
         revealAll();
       }
     }
@@ -281,6 +282,7 @@
     function revealAll() {
       revealed = true;
       shell.classList.add('revealed');
+      surpriseText.textContent = 'You’re going to be an aunt 👶';
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       launchConfetti();
     }
@@ -288,8 +290,11 @@
     function launchConfetti() {
       if (confettiRunning) return;
       confettiRunning = true;
-      const colors = ['#f59e0b', '#f97316', '#fde68a', '#ffffff', '#fb923c'];
-      confettiPieces = Array.from({ length: 180 }, () => ({
+      const colors = ['#f59e0b', '#f97316', '#fde68a', '#ffffff', '#fb923c', '#f9a8d4', '#93c5fd'];
+      const babySymbols = ['👶', '🍼', '⭐', '🧸', '🌟'];
+      confettiPieces = Array.from({ length: 150 }, (_, index) => ({
+        type: index % 4 === 0 ? 'emoji' : 'rect',
+        symbol: babySymbols[Math.floor(Math.random() * babySymbols.length)],
         x: Math.random() * window.innerWidth,
         y: -20 - Math.random() * window.innerHeight * 0.4,
         w: 6 + Math.random() * 8,
@@ -299,7 +304,8 @@
         rotation: Math.random() * Math.PI,
         vr: -0.2 + Math.random() * 0.4,
         color: colors[Math.floor(Math.random() * colors.length)],
-        life: 90 + Math.random() * 50,
+        size: 18 + Math.random() * 12,
+        life: 100 + Math.random() * 55,
       }));
       requestAnimationFrame(animateConfetti);
     }
@@ -316,8 +322,15 @@
         confettiCtx.save();
         confettiCtx.translate(piece.x, piece.y);
         confettiCtx.rotate(piece.rotation);
-        confettiCtx.fillStyle = piece.color;
-        confettiCtx.fillRect(-piece.w / 2, -piece.h / 2, piece.w, piece.h);
+        if (piece.type === 'emoji') {
+          confettiCtx.font = `${piece.size}px system-ui`;
+          confettiCtx.textAlign = 'center';
+          confettiCtx.textBaseline = 'middle';
+          confettiCtx.fillText(piece.symbol, 0, 0);
+        } else {
+          confettiCtx.fillStyle = piece.color;
+          confettiCtx.fillRect(-piece.w / 2, -piece.h / 2, piece.w, piece.h);
+        }
         confettiCtx.restore();
       });
 
