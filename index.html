@@ -154,11 +154,11 @@
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     const confettiCanvas = document.getElementById('confettiCanvas');
     const confettiCtx = confettiCanvas.getContext('2d');
+    const surpriseText = document.getElementById('surpriseText');
 
     let drawing = false;
     let lastPoint = null;
     let revealed = false;
-    const surpriseText = document.getElementById('surpriseText');
     let confettiPieces = [];
     let confettiRunning = false;
 
@@ -265,6 +265,8 @@
     }
 
     function updateProgress() {
+      if (revealed) return;
+
       const rect = shell.getBoundingClientRect();
       const width = Math.max(1, Math.floor(rect.width));
       const height = Math.max(1, Math.floor(rect.height));
@@ -272,17 +274,25 @@
       let transparent = 0;
       let sampled = 0;
 
-      for (let y = 0; y < height; y += 2) {
-        for (let x = 0; x < width; x += 2) {
+      for (let y = 0; y < height; y += 3) {
+        for (let x = 0; x < width; x += 3) {
           const i = (y * width + x) * 4 + 3;
-          if (imageData[i] < 128) transparent++;
+          if (imageData[i] < 32) transparent++;
           sampled++;
         }
       }
 
       const percent = Math.round((transparent / sampled) * 100);
 
-      if (percent >= 65 && !revealed) {
+      if (percent >= 75) {
+        surpriseText.textContent = 'Almost there!';
+      } else if (percent >= 25) {
+        surpriseText.textContent = 'Keep scratching!';
+      } else {
+        surpriseText.textContent = 'Keep scratching!';
+      }
+
+      if (transparent === sampled) {
         revealAll();
       }
     }
