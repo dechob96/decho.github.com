@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Little Surprise</title>
+  <style>
+    :root {
+      --bg1: #fffaf2;
+      --bg2: #ffe7bf;
+      --card: rgba(255,255,255,0.82);
+      --text: #4a3422;
+      --accent: #f59e0b;
+      --accent2: #f97316;
+      --shadow: 0 20px 50px rgba(120, 80, 20, 0.16);
+      --radius: 28px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #fff 0%, transparent 28%),
+        radial-gradient(circle at bottom right, #ffd7e4 0%, transparent 24%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    .floating-hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -40px;
+      font-size: 18px;
+      opacity: 0.2;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(0) rotate(0deg); opacity: 0; }
+      20% { opacity: 0.22; }
+      to { transform: translateY(-115vh) rotate(24deg); opacity: 0; }
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 760px);
+    }
+
+    .card {
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: clamp(20px, 4vw, 36px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+    }
+
+    .lead {
+      margin: 0 0 26px;
+      font-size: clamp(1rem, 2.4vw, 1.15rem);
+      color: rgba(59, 31, 43, 0.82);
+    }
+
+    .scratch-shell {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #fff8fb, #fff);
+      box-shadow: inset 0 0 0 1px rgba(255, 143, 171, 0.15);
+    }
+
+    .surprise {
+      min-height: 360px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 30px;
+      position: relative;
+      background:
+        radial-gradient(circle at top, rgba(255, 143, 171, 0.18), transparent 30%),
+        linear-gradient(180deg, #fffdfd, #fff2f7);
+    }
+
+    .surprise-inner {
+      max-width: 560px;
+    }
+
+    .surprise-kicker {
+      display: inline-block;
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .surprise h2 {
+      margin: 0 0 14px;
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      line-height: 1.05;
+    }
+
+    .surprise p {
+      margin: 0 auto;
+      font-size: clamp(1rem, 2.3vw, 1.15rem);
+      line-height: 1.7;
+      color: rgba(59, 31, 43, 0.88);
+    }
+
+    .secret-note {
+      margin-top: 20px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.75);
+      border-radius: 18px;
+      display: inline-block;
+      box-shadow: 0 10px 24px rgba(140, 55, 85, 0.08);
+    }
+
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    .overlay-label {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      pointer-events: none;
+      color: white;
+      font-weight: 800;
+      font-size: clamp(1.2rem, 3vw, 1.7rem);
+      letter-spacing: 0.02em;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.18);
+      padding: 24px;
+      transition: opacity 300ms ease;
+    }
+
+    .progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 14px;
+      font-size: 0.95rem;
+      color: rgba(59, 31, 43, 0.72);
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 10px;
+      background: rgba(255,255,255,0.75);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 180ms ease;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      box-shadow: 0 14px 28px rgba(255, 79, 135, 0.28);
+    }
+
+    .secondary {
+      background: rgba(255,255,255,0.82);
+      color: var(--text);
+      box-shadow: 0 10px 22px rgba(59, 31, 43, 0.08);
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      font-size: 0.9rem;
+      color: rgba(59, 31, 43, 0.62);
+    }
+
+    .revealed .overlay-label,
+    .revealed canvas {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 500ms ease;
+    }
+
+    @media (max-width: 600px) {
+      .surprise { min-height: 330px; }
+      .progress-row { flex-direction: column; align-items: stretch; }
+      .progress-row span:last-child { text-align: right; }
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-hearts" aria-hidden="true"></div>
+
+  <main class="wrap">
+    <section class="card">
+      <div class="eyebrow">✨ A special surprise is waiting</div>
+      <h1>Scratch to find out.</h1>
+      <p class="lead">
+        Use your finger or mouse to scratch the card and reveal the big news underneath.
+      </p>
+
+      <div class="scratch-shell" id="scratchShell">
+        <div class="surprise" id="surpriseContent">
+          <div class="surprise-inner">
+            <span class="surprise-kicker">Big News</span>
+            <h2>You’re going to be an aunt! 👶</h2>
+            <p>
+              We have a very special little secret to share with you, and we couldn’t wait any longer.
+              A brand new tiny human is on the way, and that means you’re getting promoted to auntie.
+            </p>
+            <div class="secret-note">
+              We cannot wait for you to meet the little one and be part of this beautiful new chapter.
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <canvas id="scratchCanvas"></canvas>
+        <div class="overlay-label" id="overlayLabel">✨ Scratch here ✨</div>
+      </div>
+
+      <div class="progress-row">
+        <span>Reveal progress</span>
+        <div class="progress-bar" aria-hidden="true">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span id="progressText">0%</span>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="revealBtn">Reveal all</button>
+        <button class="secondary" id="resetBtn">Reset card</button>
+      </div>
+
+      <div class="footer-note">
+        Tip: send this on mobile or desktop — the scratch effect works on both.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const shell = document.getElementById('scratchShell');
+    const canvas = document.getElementById('scratchCanvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const revealBtn = document.getElementById('revealBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const overlayLabel = document.getElementById('overlayLabel');
+
+    let drawing = false;
+    let lastPoint = null;
+    let revealed = false;
+
+    function resizeCanvas() {
+      const ratio = window.devicePixelRatio || 1;
+      const rect = shell.getBoundingClientRect();
+      canvas.width = Math.floor(rect.width * ratio);
+      canvas.height = Math.floor(rect.height * ratio);
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(ratio, ratio);
+      paintCover(rect.width, rect.height);
+      updateProgress();
+    }
+
+    function paintCover(width, height) {
+      const gradient = ctx.createLinearGradient(0, 0, width, height);
+      gradient.addColorStop(0, '#fbbf24');
+      gradient.addColorStop(1, '#f97316');
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      for (let i = 0; i < 18; i++) {
+        ctx.beginPath();
+        ctx.arc(
+          Math.random() * width,
+          Math.random() * height,
+          12 + Math.random() * 28,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+      }
+
+      ctx.fillStyle = 'rgba(255,255,255,0.28)';
+      ctx.font = '700 20px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Scratch me', width / 2, height / 2 + 8);
+    }
+
+    function getPoint(event) {
+      const rect = canvas.getBoundingClientRect();
+      const point = event.touches ? event.touches[0] : event;
+      return {
+        x: point.clientX - rect.left,
+        y: point.clientY - rect.top,
+      };
+    }
+
+    function scratchAt(x, y) {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(x, y, 24, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (lastPoint) {
+        ctx.lineWidth = 48;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(lastPoint.x, lastPoint.y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+
+      lastPoint = { x, y };
+    }
+
+    function startScratch(event) {
+      if (revealed) return;
+      drawing = true;
+      lastPoint = null;
+      scratchAt(...Object.values(getPoint(event)));
+      updateProgress();
+    }
+
+    function moveScratch(event) {
+      if (!drawing || revealed) return;
+      event.preventDefault();
+      const { x, y } = getPoint(event);
+      scratchAt(x, y);
+      updateProgress();
+    }
+
+    function endScratch() {
+      drawing = false;
+      lastPoint = null;
+    }
+
+    function updateProgress() {
+      const rect = shell.getBoundingClientRect();
+      const imageData = ctx.getImageData(0, 0, Math.floor(rect.width), Math.floor(rect.height)).data;
+      let transparent = 0;
+      for (let i = 3; i < imageData.length; i += 4) {
+        if (imageData[i] < 128) transparent++;
+      }
+      const total = imageData.length / 4;
+      const percent = Math.round((transparent / total) * 100);
+      progressFill.style.width = percent + '%';
+      progressText.textContent = percent + '%';
+      overlayLabel.style.opacity = Math.max(0, 1 - percent / 55).toString();
+
+      if (percent >= 55) {
+        revealAll();
+      }
+    }
+
+    function revealAll() {
+      revealed = true;
+      shell.classList.add('revealed');
+      progressFill.style.width = '100%';
+      progressText.textContent = '100%';
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function resetCard() {
+      revealed = false;
+      shell.classList.remove('revealed');
+      resizeCanvas();
+    }
+
+    canvas.addEventListener('mousedown', startScratch);
+    canvas.addEventListener('mousemove', moveScratch);
+    window.addEventListener('mouseup', endScratch);
+    canvas.addEventListener('touchstart', startScratch, { passive: true });
+    canvas.addEventListener('touchmove', moveScratch, { passive: false });
+    window.addEventListener('touchend', endScratch);
+
+    revealBtn.addEventListener('click', revealAll);
+    resetBtn.addEventListener('click', resetCard);
+    window.addEventListener('resize', resizeCanvas);
+
+    function spawnHearts() {
+      const hearts = document.querySelector('.floating-hearts');
+      const symbols = ['✨', '⭐', '🌼', '☀️'];
+      for (let i = 0; i < 18; i++) {
+        const el = document.createElement('div');
+        el.className = 'heart';
+        el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        el.style.left = Math.random() * 100 + '%';
+        el.style.animationDuration = (8 + Math.random() * 9) + 's';
+        el.style.animationDelay = (Math.random() * 8) + 's';
+        el.style.fontSize = (14 + Math.random() * 18) + 'px';
+        hearts.appendChild(el);
+      }
+    }
+
+    spawnHearts();
+    resizeCanvas();
+  </script>
+</body>
+</html>
