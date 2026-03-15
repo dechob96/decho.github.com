@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A Little Surprise</title>
+  <title>Surprise</title>
   <style>
     :root {
       --bg1: #fffaf2;
@@ -205,6 +205,12 @@
         );
         ctx.fill();
       }
+
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.font = '700 28px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Scratch me!', width / 2, height / 2);
     }
 
     function getPoint(event) {
@@ -267,7 +273,7 @@
       const total = imageData.length / 4;
       const percent = Math.round((transparent / total) * 100);
 
-      if (percent >= 70 && !revealed) {
+      if (percent >= 60 && !revealed) {
         revealAll();
       }
     }
